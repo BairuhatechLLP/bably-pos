@@ -96,7 +96,7 @@ export default function ProductOptionModal(props: any) {
                 {props?.product?.idescription}
               </Text>
               <Text style={styles.ModalPrice}>
-                {props?.product?.sp_price || 0}
+                £{props?.product?.sp_price || 0}
               </Text>
             </View>
             <TouchableOpacity onPress={() => props?.close()}>

@@ -3692,7 +3692,7 @@ export class ReportService {
         FROM product_master pm
         LEFT JOIN order_items oi ON pm.id = oi.productId
         LEFT JOIN order_master om ON oi.orderId = om.id
-          AND om.orderStatus = 'finished'
+          AND om.orderStatus != 'cancelled'
           ${orderDateFilter}
         WHERE pm.companyid = :companyId
         ${categoryCondition}

@@ -131,7 +131,7 @@ const SalesReportScreen = () => {
       <View style={styles.statContent}>
         <Text style={styles.statLabel}>{label}</Text>
         <Text style={styles.statValue}>
-          {currency ? '₹ ' : ''}
+          {currency ? '£ ' : ''}
           {value?.toLocaleString() || '0'}
         </Text>
       </View>
@@ -159,13 +159,13 @@ const SalesReportScreen = () => {
         <View style={styles.productDetailItem}>
           <Text style={styles.productDetailLabel}>Sales Value</Text>
           <Text style={styles.productDetailValue}>
-            ₹ {product?.salesValue?.toLocaleString() || '0'}
+            £ {product?.salesValue?.toLocaleString() || '0'}
           </Text>
         </View>
         <View style={styles.productDetailItem}>
           <Text style={styles.productDetailLabel}>Avg Price</Text>
           <Text style={styles.productDetailValue}>
-            ₹ {product?.averagePrice?.toFixed(2) || '0.00'}
+            £ {product?.averagePrice?.toFixed(2) || '0.00'}
           </Text>
         </View>
         <View style={styles.productDetailItem}>

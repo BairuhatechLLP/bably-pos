@@ -217,7 +217,7 @@ const ReportScreen = () => {
                 <View style={styles.summaryCard}>
                   <Ionicons name="cash-outline" style={styles.summaryIcon} />
                   <Text style={styles.summaryLabel}>Total Sales</Text>
-                  <Text style={styles.summaryValue}>₹{getTotalSales().toFixed(2)}</Text>
+                  <Text style={styles.summaryValue}>£{getTotalSales().toFixed(2)}</Text>
                 </View>
                 <View style={styles.summaryCard}>
                   <Ionicons name="cube-outline" style={styles.summaryIcon} />
@@ -246,14 +246,14 @@ const ReportScreen = () => {
                           {product?.productName}
                         </Text>
                         <Text style={styles.productSales}>
-                          ₹{product?.salesValue?.toFixed(2)}
+                          £{product?.salesValue?.toFixed(2)}
                         </Text>
                       </View>
                       <View style={styles.productDetails}>
                         <View style={styles.productDetailRow}>
                           <Ionicons name="pricetag-outline" style={styles.detailIcon} />
                           <Text style={styles.productDetailText}>
-                            Price: ₹{product?.averagePrice?.toFixed(2)}
+                            Price: £{product?.averagePrice?.toFixed(2)}
                           </Text>
                         </View>
                         <View style={styles.productDetailRow}>

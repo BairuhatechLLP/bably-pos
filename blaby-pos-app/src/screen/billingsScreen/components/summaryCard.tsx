@@ -201,7 +201,7 @@ const SummaryCard = (props: any) => {
         <View style={styles.Box2}>
           <Text style={styles.text1}>Total : </Text>
           <Text style={styles.text2}>
-            {CalculateSum(props?.orderItems, props?.ac)?.total}
+            £{CalculateSum(props?.orderItems, props?.ac)?.total}
           </Text>
         </View>
         <PrimaryButton

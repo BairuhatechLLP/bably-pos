@@ -17,6 +17,7 @@ import Statics from './components/statics';
 const SettingScreen = () => {
   const navigation = useNavigation<any>();
   const Auth = useSelector((state: any) => state?.Auth?.user);
+  const isAdmin = Auth?.staff?.staffAccess?.includes('administrator');
   const[data,setData] = useState({})
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const SettingScreen = () => {
         {isMobile() ? (
           <>
             <ProfileCard />
-            <Statics data={data}/>
+            {isAdmin ? <Statics data={data} /> : null}
           </>
         ) : null}
         <Menus />
@@ -63,7 +64,7 @@ const SettingScreen = () => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.ScrollView}>
               <ProfileCard />
-              <Statics data={data}/>
+              {isAdmin ? <Statics data={data} /> : null}
             </ScrollView>
           </View>
         </View>

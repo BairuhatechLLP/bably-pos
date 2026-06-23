@@ -43,7 +43,7 @@ const ProductItem = memo(
             source={require('../../../assets/images/placeholder.png')}
             style={styles.image}>
             <View style={styles.priceBox}>
-              <Text style={styles.text2}>{item?.sp_price || 0}</Text>
+              <Text style={styles.text2}>£{item?.sp_price || 0}</Text>
             </View>
           </ImageBackground>
         ) : null}
@@ -52,7 +52,7 @@ const ProductItem = memo(
           {showImage ? null : (
             <View style={[styles.priceBox, {marginTop: 5}]}>
               <Text style={[styles.text2, {color: COLORS.primary}]}>
-                {Number(item?.sp_price).toFixed(2) || 0}
+                £{Number(item?.sp_price).toFixed(2) || 0}
               </Text>
             </View>
           )}

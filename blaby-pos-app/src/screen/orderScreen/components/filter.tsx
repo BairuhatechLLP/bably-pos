@@ -64,67 +64,78 @@ const Filter = (props: any) => {
           )}
         </View>
       )}
-      {/* Status Filter */}
-      <View style={styles.filterSection}>
-        {/* <Text style={styles.filterLabel}>Filter by Status</Text> */}
-        <ScrollView
-          contentContainerStyle={styles.Box1}
-          horizontal
-          showsHorizontalScrollIndicator={false}>
-          {status?.map((item: any) => {
-            let selected = props?.status === item?.value;
-            return (
-              <TouchableOpacity
-                style={[styles.btn1, selected ? styles.selected : {}]}
-                key={item?.key}
-                onPress={() => props?.setStatus(item?.value)}>
-                <Text style={styles.btn1Text}>{item.label}</Text>
-                {selected ? (
-                  props?.loading2 ? (
-                    <ActivityIndicator size={'small'} color={COLORS?.primary} />
-                  ) : (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={20}
-                      color={COLORS.primary}
-                    />
-                  )
-                ) : null}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-      {/* Table Filter */}
-      <View style={styles.filterSection}>
-        <ScrollView
-          contentContainerStyle={styles.Box1}
-          horizontal
-          showsHorizontalScrollIndicator={false}>
-          {props?.tables?.map((item: any) => {
-            let selected = props?.table === item?.table_number;
-            return (
-              <TouchableOpacity
-                style={[styles.btn1, selected ? styles.selected : {}]}
-                key={item?.id}
-                onPress={() => onTableChange(item)}>
-                <Text style={styles.btn1Text}>{item.table_number}</Text>
-                {selected ? (
-                  props?.loading2 ? (
-                    <ActivityIndicator size={'small'} color={COLORS?.primary} />
-                  ) : (
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={20}
-                      color={COLORS.primary}
-                    />
-                  )
-                ) : null}
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
+      {/* Status & Table filter bars hidden per request.
+          To restore, change the `false` guard below back to `true`. */}
+      {false && (
+        <>
+          {/* Status Filter */}
+          <View style={styles.filterSection}>
+            <ScrollView
+              contentContainerStyle={styles.Box1}
+              horizontal
+              showsHorizontalScrollIndicator={false}>
+              {status?.map((item: any) => {
+                let selected = props?.status === item?.value;
+                return (
+                  <TouchableOpacity
+                    style={[styles.btn1, selected ? styles.selected : {}]}
+                    key={item?.key}
+                    onPress={() => props?.setStatus(item?.value)}>
+                    <Text style={styles.btn1Text}>{item.label}</Text>
+                    {selected ? (
+                      props?.loading2 ? (
+                        <ActivityIndicator
+                          size={'small'}
+                          color={COLORS?.primary}
+                        />
+                      ) : (
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={20}
+                          color={COLORS.primary}
+                        />
+                      )
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+          {/* Table Filter */}
+          <View style={styles.filterSection}>
+            <ScrollView
+              contentContainerStyle={styles.Box1}
+              horizontal
+              showsHorizontalScrollIndicator={false}>
+              {props?.tables?.map((item: any) => {
+                let selected = props?.table === item?.table_number;
+                return (
+                  <TouchableOpacity
+                    style={[styles.btn1, selected ? styles.selected : {}]}
+                    key={item?.id}
+                    onPress={() => onTableChange(item)}>
+                    <Text style={styles.btn1Text}>{item.table_number}</Text>
+                    {selected ? (
+                      props?.loading2 ? (
+                        <ActivityIndicator
+                          size={'small'}
+                          color={COLORS?.primary}
+                        />
+                      ) : (
+                        <Ionicons
+                          name="checkmark-circle"
+                          size={20}
+                          color={COLORS.primary}
+                        />
+                      )
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </>
+      )}
     </View>
   );
 };

@@ -20,14 +20,7 @@ const Menus = () => {
   const Auth = useSelector((state: any) => state?.Auth?.user);
   const isAdmin = Auth?.staff?.staffAccess?.includes('administrator');
   const [isLogout, setIsLogout] = useState<any>(false);
-  const meusitem = [
-    {
-      id: 1,
-      value: 'Reports',
-      path: 'ReportScreen',
-      icon: 'stats-chart',
-      color: '#9534eb',
-    },
+  const meusitem: any[] = [
     {
       id: 2,
       value: 'Sync',
@@ -51,8 +44,17 @@ const Menus = () => {
     },
   ];
 
-  // VAT / Tax settings — visible only to admin users
+  // Admin-only menu items — hidden from regular staff
   if (isAdmin) {
+    // Reports at the top
+    meusitem.unshift({
+      id: 1,
+      value: 'Reports',
+      path: 'ReportScreen',
+      icon: 'stats-chart',
+      color: '#9534eb',
+    });
+    // VAT / Tax at the bottom
     meusitem.push({
       id: 5,
       value: 'VAT / Tax',

@@ -23,7 +23,7 @@ const CartItem = (props: any) => {
           </TouchableOpacity>
         </View>
         <View>
-          <Text style={styles.text1}>{props?.item?.sp_price} x  </Text>
+          <Text style={styles.text1}>£{props?.item?.sp_price} x  </Text>
         </View>
         <View style={styles.groupBox}>
           <TouchableOpacity style={styles.btn2} onPress={()=>props.updateCart("remove")}>

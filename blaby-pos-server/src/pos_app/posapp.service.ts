@@ -176,8 +176,18 @@ export class PosAppService {
         whereCondition.orderStatus = { [Op.ne]: "cancelled" };
 
         const parseTime = (timeStr: string) => {
-          const [time, period] = timeStr.split(" ");
+          // Guard against missing/malformed working-time settings.
+          if (!timeStr || typeof timeStr !== "string") {
+            return null;
+          }
+          const [time, period] = timeStr.trim().split(" ");
+          if (!time || !time.includes(":")) {
+            return null;
+          }
           const [hours, minutes] = time.split(":").map(Number);
+          if (Number.isNaN(hours) || Number.isNaN(minutes)) {
+            return null;
+          }
 
           let hour24 = hours;
           if (period === "PM" && hours !== 12) {
@@ -197,6 +207,44 @@ export class PosAppService {
         const currentHour = now.getHours();
         let startDate: Date;
         let endDate: Date;
+
+        if (!fromTime || !toTime) {
+          // Working times not configured/invalid — fall back to a plain
+          // today window (midnight to midnight) so totals still show.
+          startDate = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            0,
+            0,
+            0
+          );
+          endDate = new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+            23,
+            59,
+            59
+          );
+          whereCondition.createdAt = {
+            [Op.gte]: startDate,
+            [Op.lte]: endDate,
+          };
+
+          const result = await OrderMaster.findAll({
+            attributes: [
+              [fn("COUNT", col("id")), "count"],
+              [fn("SUM", col("total")), "sum"],
+            ],
+            where: whereCondition,
+            raw: true,
+          });
+
+          const data = result?.length ? result[0] : {};
+          resolve(new CommonResponseDto(data, true, "fetched Successfully"));
+          return;
+        }
 
         // Check if working hours span across two days (e.g., 11:00 AM to 3:00 AM next day)
         const isNextDayOperation = toTime.hours < fromTime.hours;
@@ -274,6 +322,22 @@ export class PosAppService {
           ],
           where: whereCondition,
           raw: true,
+        });
+
+        // TEMP DIAGNOSTIC — remove once Total Amount is confirmed working.
+        const diagCount = await OrderMaster.count({
+          where: { companyId: Number(companyId) },
+        });
+        console.log("[orderStatics] DIAG", {
+          companyId: Number(companyId),
+          adminId: Number(adminId),
+          staffId: staffId ? Number(staffId) : "(none)",
+          workingTimeFrom,
+          workingTimeTo,
+          startDate: startDate?.toISOString(),
+          endDate: endDate?.toISOString(),
+          windowResult: result?.[0],
+          totalOrdersForCompanyAllTime: diagCount,
         });
 
         const data = result?.length ? result[0] : {};
