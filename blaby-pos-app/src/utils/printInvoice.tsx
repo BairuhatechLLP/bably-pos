@@ -26,6 +26,19 @@ const PrintInvoice = async (product: any, Auth: any) => {
         fonttype: 0.5,
       },
     );
+    // VAT registration number (if set by admin)
+    if (Auth?.companyInfo?.taxregno) {
+      await BluetoothEscposPrinter.printText(
+        `VAT No: ${Auth?.companyInfo?.taxregno}\n\r`,
+        {
+          encoding: 'GBK',
+          codepage: 0,
+          widthtimes: 0,
+          heigthtimes: 0,
+          fonttype: 0.5,
+        },
+      );
+    }
     // Token Divider
     await BluetoothEscposPrinter.printText(
       '-----------------------------------------------\n\r',
@@ -136,6 +149,34 @@ const PrintInvoice = async (product: any, Auth: any) => {
           BluetoothEscposPrinter.ALIGN.RIGHT,
         ],
         ['Parcel Charge', '', parcelCharge.toFixed(2)],
+        {},
+      );
+    }
+
+    // VAT — prices are VAT-inclusive, so show the VAT portion within the total
+    const vatRate = Number(Auth?.companyInfo?.tax) || 0;
+    if (vatRate > 0) {
+      const grandTotal = Number(product?.total) || 0;
+      const netTotal = grandTotal / (1 + vatRate / 100);
+      const vatAmount = grandTotal - netTotal;
+      await BluetoothEscposPrinter.printColumn(
+        itemColumns,
+        [
+          BluetoothEscposPrinter.ALIGN.LEFT,
+          BluetoothEscposPrinter.ALIGN.CENTER,
+          BluetoothEscposPrinter.ALIGN.RIGHT,
+        ],
+        ['Subtotal (excl. VAT)', '', netTotal.toFixed(2)],
+        {},
+      );
+      await BluetoothEscposPrinter.printColumn(
+        itemColumns,
+        [
+          BluetoothEscposPrinter.ALIGN.LEFT,
+          BluetoothEscposPrinter.ALIGN.CENTER,
+          BluetoothEscposPrinter.ALIGN.RIGHT,
+        ],
+        [`VAT (${vatRate}%)`, '', vatAmount.toFixed(2)],
         {},
       );
     }

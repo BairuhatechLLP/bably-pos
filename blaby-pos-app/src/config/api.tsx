@@ -6,10 +6,11 @@ const API: any = {
   //   iOS simulator:      http://localhost:8101/v1/
   //   Android emulator:   http://10.0.2.2:8101/v1/
   //   Physical device:    http://<your-LAN-IP>:8101/v1/
-  BASE_URL: 'http://localhost:8101/v1/',
+  BASE_URL: 'http://192.168.220.57:8101/v1/',
 
   STAFF_EMAIL_LOGIN:"auth/staff/email-login",
   UPDATE_PROFILE: 'ContactMaster/update/',
+  UPDATE_COMPANY: 'company_master/',
 
   POST_USER_OPEN_SHIFT:"counter_details/add/openshift",
   POST_USER_CLOSE_SHIFT:"counter_details/add/closeshift",

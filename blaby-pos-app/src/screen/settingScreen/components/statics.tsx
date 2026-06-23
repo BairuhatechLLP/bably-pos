@@ -29,7 +29,7 @@ const Statics = (props: any) => {
           <Text style={styles.text3}>Total Amount</Text>
         </View>
         <View>
-          <Text style={styles.text4}>{Number(props?.data?.sum).toFixed(2) || 0}</Text>
+          <Text style={styles.text4}>{(Number(props?.data?.sum) || 0).toFixed(2)}</Text>
         </View>
       </View>
     </View>

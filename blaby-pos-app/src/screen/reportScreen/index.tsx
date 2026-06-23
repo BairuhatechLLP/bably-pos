@@ -20,7 +20,7 @@ import {GET} from '../../utils/apiCalls';
 const ReportScreen = () => {
   const Auth = useSelector((state: any) => state?.Auth?.user);
   const [selectedFilter, setSelectedFilter] = useState('today');
-  const [selectedCategory, setSelectedCategory] = useState('shawarma');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [reportData, setReportData] = useState<any>(null);
@@ -68,7 +68,7 @@ const ReportScreen = () => {
           } else {
             console.log('Array is empty');
             setReportData(null);
-            setError('No shawarma sales data found for the selected date');
+            setError('No sales data found for the selected date');
           }
         } else if (response?.data && Object.keys(response?.data).length > 0) {
           // If it's a single object with data
@@ -77,7 +77,7 @@ const ReportScreen = () => {
         } else {
           console.log('No data in response');
           setReportData(null);
-          setError('No shawarma sales data found for the selected date');
+          setError('No sales data found for the selected date');
         }
       } else {
         const errorMsg = response?.message || 'Failed to fetch sales report';
@@ -166,7 +166,7 @@ const ReportScreen = () => {
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <Ionicons name="stats-chart" style={styles.headerIcon} />
-            <Text style={styles.headerTitle}>Shawarma Sales Report</Text>
+            <Text style={styles.headerTitle}>Products Sales Report</Text>
           </View>
         </View>
 
@@ -270,7 +270,7 @@ const ReportScreen = () => {
                 <View style={styles.noDataBox}>
                   <Ionicons name="cart-outline" style={styles.noDataIcon} />
                   <Text style={styles.noDataText}>
-                    No shawarma sales recorded for {selectedFilter}
+                    No sales recorded for {selectedFilter}
                   </Text>
                   <Text style={[styles.noDataText, {fontSize: 12, marginTop: 8}]}>
                     {allProducts.length} product{allProducts.length !== 1 ? 's' : ''} available in catalog

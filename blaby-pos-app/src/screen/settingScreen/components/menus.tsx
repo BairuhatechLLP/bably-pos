@@ -17,6 +17,8 @@ import LogoutModal from './logoutModal';
 
 const Menus = () => {
   const navigation = useNavigation<any>();
+  const Auth = useSelector((state: any) => state?.Auth?.user);
+  const isAdmin = Auth?.staff?.staffAccess?.includes('administrator');
   const [isLogout, setIsLogout] = useState<any>(false);
   const meusitem = [
     {
@@ -48,6 +50,17 @@ const Menus = () => {
       color: '#fcba03',
     },
   ];
+
+  // VAT / Tax settings — visible only to admin users
+  if (isAdmin) {
+    meusitem.push({
+      id: 5,
+      value: 'VAT / Tax',
+      path: 'VatSettingsScreen',
+      icon: 'calculator-outline',
+      color: '#8C745A',
+    });
+  }
 
   return (
     <ScrollView

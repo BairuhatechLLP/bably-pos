@@ -26,6 +26,7 @@ import ConfigScreen from '../screen/configScreen';
 import QuickProducts from "../screen/quickProducts";
 import ReportScreen from '../screen/reportScreen';
 import SalesReportScreen from '../screen/salesReportScreen';
+import VatSettingsScreen from '../screen/vatSettingsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tabs = createBottomTabNavigator();
@@ -136,6 +137,12 @@ const Navigation = () => {
         name="ConfigScreen"
         component={ConfigScreen}
         options={{...stackOption, title: 'Configuration'}}
+      />
+
+      <Stack.Screen
+        name="VatSettingsScreen"
+        component={VatSettingsScreen}
+        options={{...stackOption, title: 'VAT / Tax Settings'}}
       />
 
       <Stack.Screen

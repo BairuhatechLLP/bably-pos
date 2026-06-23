@@ -26,6 +26,12 @@ const authSlice = createSlice({
     setTokenInUser: (state: any, action) => {
       state.user = {...state.user,token:action.payload}
     },
+    updateCompany: (state: any, action: any) => {
+      state.user = {
+        ...state.user,
+        companyInfo: {...state.user?.companyInfo, ...action.payload},
+      };
+    },
     logout: (state: any) => {
       state.auth = false;
       state.user = {};
@@ -41,7 +47,8 @@ export const {
   saveData,
   setToken,
   update,
-  setTokenInUser
+  setTokenInUser,
+  updateCompany
 } = authSlice.actions;
 
 export const selectUser = (state: any) => state.auth.user;
