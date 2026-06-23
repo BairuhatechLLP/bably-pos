@@ -1,0 +1,50 @@
+[
+	{
+		"id" : 1,
+		"btitle" : "Construction",
+		"created_at" : "2022-12-23 17:43:45",
+		"updated_at" : null,
+		"deleted_at" : null,
+		"status" : 2
+	},
+	{
+		"id" : 2,
+		"btitle" : "Accountants\/Professionals",
+		"created_at" : "2022-12-23 17:43:45",
+		"updated_at" : null,
+		"deleted_at" : null,
+		"status" : 1
+	},
+	{
+		"id" : 3,
+		"btitle" : "Health Care",
+		"created_at" : "2022-12-23 17:43:45",
+		"updated_at" : null,
+		"deleted_at" : null,
+		"status" : 2
+	},
+	{
+		"id" : 4,
+		"btitle" : "Retail/Shop",
+		"created_at" : "2022-12-23 17:43:45",
+		"updated_at" : null,
+		"deleted_at" : null,
+		"status" : 2
+	},
+	{
+		"id" : 5,
+		"btitle" : "Accounting\/Business",
+		"created_at" : "2022-12-23 17:43:45",
+		"updated_at" : null,
+		"deleted_at" : null,
+		"status" : 1
+	},
+	{
+		"id" : 6,
+		"btitle" : "Taxi",
+		"created_at" : "2022-12-23 17:43:45",
+		"updated_at" : null,
+		"deleted_at" : null,
+		"status" : 2
+	}
+]

@@ -1,0 +1,368 @@
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
+    xmlns:o="urn:schemas-microsoft-com:office:office">
+
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="date=no" />
+    <meta name="format-detection" content="address=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,700,700i" rel="stylesheet" />
+    <title>Tax GO Invoice</title>
+</head>
+
+<body style="align-content: center;margin: auto;">
+    <div style="margin: 10px;">
+        <table style="margin: auto;
+        width: 100%;
+        text-align: right;
+        padding: 8px;
+        font-size: 14px;">
+            <tbody style="text-align: right; line-height: 20px;">
+                <tr>
+                    <td width="50%" style="text-align:left; color: #c2347f; font-size: 20px;">{{purchase.invoiceno}}</td>
+                    <td width="50%" style="text-align: right;">
+                        {{#purchaseComplete}}
+                        <div>
+                            <div style="padding: 5px;
+                                    float: right;
+                                    text-align: center;
+                                    border: 1px solid green;
+                                    border-radius: 4px;
+                                    color: green;
+                                    font-weight: 700;
+                                    font-size: 12px;
+                                    width: 32px;">Paid</div>
+                        </div>
+                        {{/purchaseComplete}}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;"><b>
+                            {{#purchase.name}}
+                            {{purchase.name}}
+                            {{/purchase.name}}
+                            {{^purchase.name}}
+                            -
+                            {{/purchase.name}}
+                        </b></td>
+                    <td style="text-align:right;"><b>
+                            {{#userInfo.companyInfo.bname}}
+                            {{userInfo.companyInfo.bname}}
+                            {{/userInfo.companyInfo.bname}}
+                            {{^userInfo.companyInfo.bname}}
+                            -
+                            {{/userInfo.companyInfo.bname}}
+                        </b></td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        {{#supplier.bname}}
+                        {{supplier.bname}}
+                        {{/supplier.bname}}
+                        {{^supplier.bname}}
+                        -
+                        {{/supplier.bname}}
+                    </td>
+                    <td style="text-align:right;">
+                        {{#userInfo.companyInfo.fullAddress}}
+                        {{userInfo.companyInfo.fullAddress}}
+                        {{/userInfo.companyInfo.fullAddress}}
+                        {{^userInfo.companyInfo.fullAddress}}
+                        -
+                        {{/userInfo.companyInfo.fullAddress}}
+                        <br>
+                        {{#country.name}}
+                        {{country.name}}
+                        {{/country.name}}
+                    </td>
+
+                </tr>
+                <tr>
+
+                    <td style="text-align:left;">Phone:
+                        {{#supplier.mobile}}
+                        {{supplier.mobile}}
+                        {{/supplier.mobile}}
+                    </td>
+                    <td style="text-align: right;">
+                        {{#userInfo.taxregno}}
+                        Tax Reg. No.: {{userInfo.taxregno}}
+                        {{/userInfo.taxregno}}
+                        <br>
+                        Phone:
+                        {{#userInfo.phonenumber}}
+                        {{userInfo.phonenumber}}
+                        {{/userInfo.phonenumber}}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">Email:
+                        {{#supplier.email}}
+                        {{supplier.email}}
+                        {{/supplier.email}}
+                    </td>
+                    <td style="text-align: right;">Email:
+                        {{#userInfo.email}}
+                        {{userInfo.email}}
+                        {{/userInfo.email}}
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+        <table style="margin: auto;
+            width: 100%;
+            border-spacing: 0px;
+            text-align: right;
+            background: #c43281;
+            color: white;
+            font-size: 14px;">
+            <tbody style="text-align: center;">
+                <tr style="line-height: 40px;font-size: 12px;">
+                    <td width="50%" style="border: 1px solid white;">Total Due &nbsp; <span
+                            style="font-size: 20px;">{{countryInfo.symbol}}{{purchase.outstanding}}</span>
+                    </td>
+                    <td width="50%" style="border: 1px solid white;">Due Date &nbsp; <span
+                            style="font-size: 20px;">{{purchase.ldate}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table style="margin-top: 5px !important;margin: auto;width: 100%;">
+            <tbody style="text-align: left;">
+                <tr
+                    style="background: white;color: #c43281;text-align: left; font-size: 10px; text-transform: uppercase;">
+                    <td style="height: 40px; border-bottom: 1px solid #c43281;" width="12%"><b>Product/Service</b></td>
+                    <td width="12%" style="border-bottom: 1px solid #c43281;"><b>Description</b></td>
+                    <td width="12%" style="border-bottom: 1px solid #c43281;"><b>Qty/Hrs</b></td>
+                    <td width="12%" style="border-bottom: 1px solid #c43281;"><b>Price/Rate</b></td>
+                    <td width="12%" style="text-align: center;border-bottom: 1px solid #c43281;"><b>Discount <br>(Amt &
+                            %)</b></td>
+                    <td width="12%" style="text-align: center;border-bottom: 1px solid #c43281;"><b>VAT <br>(Amt &
+                            %)</b></td>
+                    <td width="12%" style="text-align: right;border-bottom: 1px solid #c43281;"><b>Amount($)</b></td>
+                </tr>
+                {{#inpurchase}}
+                <tr style="font-size: 12px;">
+                    <td style="text-align: left;">
+                        {{#product.icode}}
+                        {{product.icode}}
+                        {{#product.idescription}}
+                        - {{product.idescription}}
+                        {{/product.idescription}}
+                        {{/product.icode}}
+                        {{^product.icode}}
+                        {{#description}}
+                        {{description}}
+                        {{/description}}
+                        {{/product.icode}}
+                    </td>
+                    <td style="text-align: left;">
+                        {{#description}}
+                        {{description}}
+                        {{/description}}
+                    </td>
+                    <td>
+                        {{#quantity}}
+                        {{quantity}}
+                        {{/quantity}}
+                    </td>
+                    <td>
+                        {{#costprice}}
+                        {{costprice}}
+                        {{/costprice}}
+                    </td>
+                    <td style="text-align: center;">
+                        {{#discount}}
+                        {{discount}}
+                        {{/discount}}
+                        {{^discount}}
+                        -
+                        {{/discount}}
+                    </td>
+                    <td style="text-align: center;">
+                        {{#incomeTaxAmount}}
+                        {{incomeTaxAmount}} @ {{incomeTax}}
+                        {{/incomeTaxAmount}}
+                        {{^incomeTaxAmount}}
+                        0 @ 0.00
+                        {{/incomeTaxAmount}}
+                    </td>
+                    <td style="text-align: right;">
+                        {{#total}}
+                        {{countryInfo.symbol}}{{total}}
+                        {{/total}}
+                    </td>
+                </tr>
+                {{/inpurchase}}
+            </tbody>
+        </table>
+        <hr style="border: 0.5px solid #c43281;">
+        <table style="margin-top: 5px !important;margin: auto;width: 100%; line-height: 18px;">
+            <tbody style="text-align: center;">
+                <tr style="font-size: 12px;">
+                    <td width="75%"></td>
+                    <td style="text-align: right;"><b>Sub Total</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: right;"><b>
+                            {{#netTotal}}
+                            {{countryInfo.symbol}}{{netTotal}}
+                            {{/netTotal}}
+                        </b></td>
+                </tr>
+                <tr style="font-size: 12px;">
+                    <td width="75%"></td>
+                    <td style="text-align: right;"><b>Total VAT</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: right;"><b>
+                            {{#vatTotal}}
+                            {{countryInfo.symbol}}{{vatTotal}}
+                            {{/vatTotal}}
+                        </b></td>
+                </tr>
+                <tr style="font-size: 12px;">
+                    <td width="75%"></td>
+                    <td style="text-align: right;"><b>Total</b></td>
+                    <td style="text-align: right;"><b>
+                            {{#purchase.total}}
+                            {{countryInfo.symbol}}{{sale.total}}
+                            {{/purchase.total}}
+                        </b></td>
+                </tr>
+                {{#purchase.totalText}}
+                <tr style="text-align:right">
+                    <td colspan="4">({{purchase.totalText}})</td>
+                </tr>
+                {{/purchase.totalText}}
+            </tbody>
+        </table>
+        <table style="margin: auto;
+            width: 100%;
+            border-spacing: 0px;
+            text-align: right;
+            background: #c43281;
+            color: white;
+            font-size: 14px;">
+            <tbody style="text-align: center;">
+                <tr style="line-height: 40px;font-size: 12px;">
+                    <td width="40%" style="background-color: white;"></td>
+                    <td style="border: 1px solid white;">Total Due Amount</td>
+                    <td style="border: 1px solid white;">
+                        {{countryInfo.symbol}}{{sale.outstanding}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div style="text-align: center;
+        background: #c23681;
+        padding: 3px;
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 1px;
+        margin-top: 10px;"> Payment Information </div>
+        <table style="margin: auto;width: 100%;">
+            <tbody style="text-align: center;">
+                <tr
+                    style="background: white;color: #c23681;text-align: center;font-size: 9px;text-transform: uppercase;">
+                    <td style="border-bottom:1px solid #c43281;text-align: left; text-transform: uppercase;"
+                        width="12%"><b>Bank</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: left; text-transform: uppercase;"
+                        width="12%"><b>Account No.</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: left; text-transform: uppercase;"
+                        width="12%"><b>Paid Method</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: center; text-transform: uppercase;"
+                        width="12%"><b>Date</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: center; text-transform: uppercase;"
+                        width="12%"><b>Payment Type</b></td>
+                    <td style="border-bottom:1px solid #c43281;text-align: right; text-transform: uppercase;"
+                        width="12%"><b>Amount</b></td>
+                </tr>
+                {{#bankInfo}}
+                <tr style="font-size: 12px;">
+                    <td style="text-align: left;">
+                        {{bankInf.laccount}}
+                    </td>
+                    <td style="text-align: left;">
+                        {{bankInf.nominalcode}}
+                    </td>
+                    <td style="text-align: left;">
+                        {{bankInf.paidmethod}}
+                    </td>
+                    <td style="text-align: center;">
+                        {{date}}
+                    </td>
+                    <td style="text-align: center;">
+                        {{type}}
+                    </td>
+                    <td style="text-align: right;">
+                        {{countryInfo.symbol}}{{amount}}
+                    </td>
+                </tr>
+                {{/bankInfo}}
+            </tbody>
+        </table>
+        <table style="margin: auto;
+                width: 100%;
+                text-align: right;
+                background: #f0f4f6;
+                padding: 8px;
+                margin-top: 20px;
+                border-top: 1px solid #c03a81;
+                font-size: 14px;
+                border-bottom: 1px solid #c03a81;">
+            <tbody style="text-align: right; line-height: 20px;font-size: 12px;">
+                <tr>
+                    <td style="text-align:left;"><b>Invoice Address</b></td>
+                    <td style="text-align: left;"><b>Delivery Address</b></td>
+                    <td width="40%" style="text-align:left;"></td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        {{#purchase.inaddress}}
+                        {{purchase.inaddress}}
+                        {{/purchase.inaddress}}
+                        {{^purchase.inaddress}}
+                        -
+                        {{/purchase.inaddress}}
+                    </td>
+                    <td style="text-align: left;">
+                        {{#purchase.deladdress}}
+                        {{purchase.deladdress}}
+                        {{/purchase.deladdress}}
+                        {{^purchase.deladdress}}
+                        -
+                        {{/purchase.deladdress}}
+                    </td>
+                    <td style="text-align:left;"></td>
+                </tr>
+            </tbody>
+        </table>
+        <table style="width:100%">
+            <tr style="width:100%;height:30px">
+                <td style="width:50%"></td>
+                <td style="width:50%"></td>
+            </tr>
+            <tr style="width:100%;height:70px">
+                <td style="width:50%"></td>
+                <td style="width:50%;border-top:1px solid gray;border-right:1px solid gray;border-left:1px solid gray">
+                </td>
+            </tr>
+            <tr style="width:100%;height:10px">
+                <td style="width:50%"></td>
+                <td
+                    style="width:50%;border-bottom:1px solid gray;border-right:1px solid gray;border-left:1px solid gray;padding-left:120px">
+                    Authorised Signatory</td>
+            </tr>
+        </table>
+        <div style="font-size: 10px; margin-top: 25px;">
+            <p style="text-align: center;">Created by <a href="https://www.taxgoglobal.com/">taxglobal.com</a></p>
+        </div>
+    </div>
+</body>
+
+</html>

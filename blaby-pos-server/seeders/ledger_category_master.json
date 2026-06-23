@@ -1,0 +1,148 @@
+[
+	
+	{
+		"id" : 1,
+		"category" :"Current asset",
+		"categorygroup" : 1,
+		"adminid" : -2,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+
+	{
+		"id" : 2,
+		"category" : "credit card/loan",
+		"categorygroup" : 2,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 3,
+		"category" : "current assets",
+		"categorygroup" : 1,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 4,
+		"category" : "current liability",
+		"categorygroup" : 2,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 5,
+		"category" : "depreciation",
+		"categorygroup" : 3,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 6,
+		"category" : "direct expenses",
+		"categorygroup" : 3,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 7,
+		"category" : "equity",
+		"categorygroup" : 4,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 8,
+		"category" : "fixed assets",
+		"categorygroup" : 1,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 9,
+		"category" : "future assets",
+		"categorygroup" : 1,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 10,
+		"category" : "future liability",
+		"categorygroup" : 2,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 11,
+		"category" : "Indirect income",
+		"categorygroup" : 5,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 12,
+		"category" : "Indirect expenses",
+		"categorygroup" : 3,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 13,
+		"category" : "sales",
+		"categorygroup" : 5,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 14,
+		"category" : "purchase",
+		"categorygroup" : 3,
+		"adminid" : 1,
+		"createdat" : "2022-12-23 19:13:47",
+		"updatedat" : null
+	},
+	{
+		"id" : 22,
+		"category" : "cash in hand",
+		"categorygroup" : 1,
+		"adminid" : 1,
+		"createdat" : "2023-11-09 07:06:15",
+		"updatedat" : "2023-11-09 07:06:15"
+	},
+	{
+		"id" : 24,
+		"category" : "direct income",
+		"categorygroup" : 5,
+		"adminid" : 1,
+		"createdat" : "0000-00-00 00:00:00",
+		"updatedat" : "0000-00-00 00:00:00"
+	},
+	{
+		"id" : 27,
+		"category" : "sundry debtor.",
+		"categorygroup" : 1,
+		"adminid" : 1,
+		"createdat" : "2024-01-01 05:48:17",
+		"updatedat" : null
+	},
+	{
+		"id" : 28,
+		"category" : "sundry creditor.",
+		"categorygroup" : 2,
+		"adminid" : 1,
+		"createdat" : "2024-01-01 05:49:12",
+		"updatedat" : null
+	}
+]

@@ -1,0 +1,61 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
+
+export class UpdateDto {
+  @IsOptional() @ApiProperty() @IsNumber() readonly status?: number;
+  @IsOptional() @ApiProperty() @IsString() readonly type?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly expiretime?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly bname?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly btype?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly registerno?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly rtype?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly rdate?: Date;
+  @IsOptional() @ApiProperty() @IsString() readonly expiredate?: Date;
+  @IsOptional() @ApiProperty() @IsString() readonly plan?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly company?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly address1?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly address2?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly city?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly cemail?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly cphoneno?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly cperson?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly taxregno?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly tax?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly taxno?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly logo?: string;
+  @IsOptional() @ApiProperty() @IsNumber() readonly adminid?: number;
+  @IsOptional() @ApiProperty() @IsNumber() readonly userid?: number;
+  @IsOptional() @ApiProperty() @IsString() readonly bimage?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly bcategory?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly accounttype?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly defaultmail?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly defaultinvoice?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly accplan?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly cusNotes?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly fulladdress?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly website?: string;
+  @IsOptional() @ApiProperty() @IsNumber() readonly reporttype?: number;
+  @IsOptional() @ApiProperty() @IsString() readonly endYear?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly financial_year_start?: Date;
+  @IsOptional() @ApiProperty() @IsString() readonly books_begining_from?: Date;
+  @IsOptional() @ApiProperty() @IsString() readonly defaultTerms?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly stripeKey?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly payStackKey?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly country?: number;
+  @IsOptional() @ApiProperty() @IsString() readonly state?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly defaultMerchant?: string;
+  @IsOptional() @ApiProperty() @IsString() readonly stripe_offline_link?: string;
+  @IsOptional() @ApiProperty() @IsNumber() readonly defaultBank?: number;
+  @IsOptional() @ApiProperty() @IsNumber()  readonly isEwayBill?: boolean;
+  @IsOptional() @ApiProperty() @IsNumber()  readonly isEInvoice?: boolean;
+  @IsOptional() @ApiProperty() @IsNumber()  readonly isOtherTerritory?: boolean;
+
+  @IsOptional() @ApiProperty() @IsNumber() readonly workingTimeFrom?: string;
+  @IsOptional() @ApiProperty() @IsNumber() readonly workingTimeTo?: string;
+  @IsOptional() @ApiProperty() @IsNumber() readonly isUniformShifts?: boolean;
+  @IsOptional() @ApiProperty() @IsBoolean() readonly isLoyaltyEnabled?: boolean;
+
+  @IsOptional() @ApiProperty() @IsString() readonly loyaltyDiscountPercentage?: number;
+  @IsOptional() @ApiProperty() @IsString() readonly referralPoint?: number;
+  @IsOptional() @ApiProperty() readonly loyaltyRedeemLimit?: number;
+}

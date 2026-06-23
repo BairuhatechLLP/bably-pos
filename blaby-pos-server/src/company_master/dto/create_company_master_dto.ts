@@ -1,0 +1,61 @@
+import { ApiProperty } from "@nestjs/swagger";
+import { Length, IsString, IsNumber, IsOptional } from "class-validator";
+
+export class CreateDto {
+  @ApiProperty() readonly status: string;
+  @ApiProperty() readonly type: string;
+  @ApiProperty() readonly expiretime: string;
+  @ApiProperty() @IsString() readonly bname: string;
+  @ApiProperty() readonly btype: string;
+  @ApiProperty() readonly registerno: string;
+  @ApiProperty() readonly rtype: string;
+  @ApiProperty() readonly rdate: Date;
+  @ApiProperty() readonly expiredate: Date;
+  @ApiProperty() readonly plan: string;
+  @ApiProperty() readonly company: string;
+  @ApiProperty() readonly address1: string;
+  @ApiProperty() readonly address2: string;
+  @ApiProperty() readonly city: string;
+  @ApiProperty() readonly cemail: string;
+  @ApiProperty() readonly cphoneno: string;
+  @ApiProperty() readonly cperson: string;
+  @ApiProperty() readonly taxregno: string;
+  @ApiProperty() readonly tax: string;
+  @ApiProperty() readonly taxno: string;
+  @ApiProperty() readonly logo: string;
+  @ApiProperty() readonly adminid: number;
+  @ApiProperty() readonly userid: number;
+  @ApiProperty() readonly bimage: string;
+  @ApiProperty() @IsString() readonly bcategory: string;
+  @ApiProperty() readonly accounttype: string;
+  @ApiProperty() readonly defaultmail: string;
+  @ApiProperty() readonly defaultinvoice: string;
+  @ApiProperty() readonly accplan: string;
+  @ApiProperty() readonly cusNotes: string;
+  @ApiProperty() readonly fulladdress: string;
+  @ApiProperty() readonly website: string;
+  @ApiProperty() readonly reporttype: number;
+  @ApiProperty() readonly endYear: string;
+  @ApiProperty() readonly financial_year_start: Date;
+  @ApiProperty() readonly books_begining_from: Date;
+  @ApiProperty() readonly defaultTerms: string;
+  @ApiProperty() readonly stripeKey: string;
+  @ApiProperty() readonly payStackKey: string;
+  @ApiProperty() @IsOptional() readonly country?: number;
+  @ApiProperty() readonly state: string;
+  @ApiProperty() readonly defaultMerchant: string;
+  @ApiProperty() readonly defaultBank: number;
+  @ApiProperty() readonly isOtherTerritory?: boolean;
+  @ApiProperty() readonly isEwayBill?: boolean;
+  @ApiProperty() readonly isEInvoice?: boolean;
+  @ApiProperty() readonly stripe_offline_link: string;
+
+  @ApiProperty() readonly workingTimeFrom: string;
+  @ApiProperty() readonly workingTimeTo: string;
+  @ApiProperty() readonly isUniformShifts?: boolean;
+  @ApiProperty() readonly isLoyaltyEnabled?: boolean;
+
+  @ApiProperty() readonly loyaltyDiscountPercentage: number;
+  @ApiProperty() readonly referralPoint: number;
+  @ApiProperty() readonly loyaltyRedeemLimit?: number;
+}

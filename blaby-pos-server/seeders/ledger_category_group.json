@@ -1,0 +1,32 @@
+[
+	{
+		"id" : 1,
+		"categorygroup" : "assets",
+		"createdat" : "2022-12-23 19:05:36",
+		"updatedat" : null
+	},
+	{
+		"id" : 2,
+		"categorygroup" : "liability",
+		"createdat" : "2022-12-23 19:05:36",
+		"updatedat" : null
+	},
+	{
+		"id" : 3,
+		"categorygroup" : "expenditure",
+		"createdat" : "2022-12-23 19:05:37",
+		"updatedat" : null
+	},
+	{
+		"id" : 4,
+		"categorygroup" : "capital",
+		"createdat" : "2022-12-23 19:05:37",
+		"updatedat" : null
+	},
+	{
+		"id" : 5,
+		"categorygroup" : "income",
+		"createdat" : "2022-12-23 19:05:37",
+		"updatedat" : null
+	}
+]
