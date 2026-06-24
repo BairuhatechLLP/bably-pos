@@ -1,0 +1,37 @@
+ 1.⁠ ⁠Eye icon should need to reverse.
+Eye icon should be enabled if password is displaying and eye icon should be striked if password is hiding.
+ 2.⁠ ⁠Need confirmation message while logging out.
+ 3.⁠ ⁠Arrow links in today's top branch and today's top product is clickable but not loading to next page.
+ 4.⁠ ⁠Report - Choose a branch and then refresh it, the data of whole branch is displaying, ie, data in initial stage is displaying.
+
+ 5.⁠ ⁠Report - Data in January 2025, calculation mismatch in February too
+
+Total of all branches : 369           26482 (Value that displaying rigt now)
+
+Perinthalmanna        : 302           17636
+Pulamanthole          : 0             0
+Koppam                : 0             0
+----------------------------------------------
+Sub total             : 302           17636 (Actual result that needs to display)
+
+ 6.⁠ ⁠Branch - Text "Search branch" is in white colour, so it is not visible.
+ 7.⁠ ⁠Calculation mismatch in Total orders and prices in this month and total orders and prices in report page.
+ 8.⁠ ⁠Branch - Choose "last month", showing 1 branch on Jan 1, 2025 to 31. Should show as 1 branch on Jan 28, 2025 to 31, ie, there is no branch available before Jan 28.
+ 9.⁠ ⁠Products - Text "Search branch" is in white colour, so it is not visible.
+10.⁠ ⁠Products - Total order and price value mismatch in Product module with respect to Branch module.
+Choose Jan 28 in Perinthalmanna from Product module, total order count calculated is 25 but showing only 14 in Branch module.
+11.⁠ ⁠Search "Grape juice normal" from Product module on Jan 28,showing 2 orders. But while clicking on it on dare not showing order placed on Jan 28. Only showing data from Feb 1.
+
+
+
+1. Done
+2. Done
+3. Done
+4. Done
+5.
+6. Done
+7.
+8.
+9. Done
+10.
+11.

@@ -1,0 +1,768 @@
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { col, fn, Op, literal, QueryTypes } from 'sequelize';
+import moment from 'moment';
+import { CommonResponseDto } from '../shared/dto/common-response.dto';
+import { OrderMaster } from '../entities/order-master.entity';
+import { OrderItems } from '../entities/order-items.entity';
+import { ProductMaster } from '../entities/product-master.entity';
+import { ProductCategory } from '../entities/product-category.entity';
+import { CompanyMaster } from '../entities/company-master.entity';
+import { SequelizeMultiDbConfig, BranchConnection } from '../config/sequelize-multi-db.config';
+
+interface ReportQueryDto {
+  from_date?: string;
+  to_date?: string;
+  branchId?: number;
+  query?: string;
+}
+
+// Type definitions for raw SQL query results
+interface TodayStatsResult {
+  todayorder: number;
+  todayamount: number | null;
+}
+
+interface Last7DaysResult {
+  label: string;
+  value: number;
+}
+
+interface TopBranchResult {
+  companyId: number;
+  totalSales: number;
+  totalOrders: number;
+  cm_id: number;
+  cm_bname: string;
+}
+
+interface TopProductResult {
+  productId: number;
+  totalAmount: number;
+  totalSold: number;
+  pm_idescription: string;
+  pm_sp_price: number;
+}
+
+@Injectable()
+export class ReportAppSequelizeService implements OnModuleInit {
+  private branchConnections: BranchConnection[] = [];
+
+  async onModuleInit() {
+    this.branchConnections = await SequelizeMultiDbConfig.initializeConnections();
+    console.log(`✅ Report Service initialized with ${this.branchConnections.length} database connections`);
+  }
+
+  private async formatDate(date: Date | moment.Moment | string) {
+    // Return date without any timezone conversion
+    // Sequelize will handle timezone based on its config
+    if (moment.isMoment(date)) {
+      return date.toDate();
+    }
+    return new Date(date);
+  }
+
+  // Helper method to execute query on all branches in parallel
+  private async queryAllBranches<T>(
+    queryFn: (connection: BranchConnection) => Promise<T>,
+  ): Promise<T[]> {
+    const promises = this.branchConnections.map((conn) => queryFn(conn));
+    return Promise.all(promises);
+  }
+
+  // HOME V2 - Data from all 7 branches in parallel
+  async Home1(pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      console.log('🔍 Home1 called with companyId:', companyId);
+      console.log('🔍 branchConnections.length:', this.branchConnections.length);
+      const date = new Date();
+      const startDate = await this.formatDate(moment(date).startOf('day'));
+      const endDate = await this.formatDate(moment(date).endOf('day'));
+      console.log('📅 Date range:', { startDate, endDate });
+      date.setHours(0, 0, 0, 0);
+      const sevenDays = new Date();
+      sevenDays.setDate(date.getDate() - 6);
+      sevenDays.setHours(0, 0, 0, 0);
+
+      // Execute queries on all branches in parallel
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        const { sequelize } = conn;
+
+        // If branchId filter is specified, skip other branches
+        if (pageOpt?.branchId && conn.id !== pageOpt.branchId) {
+          return null;
+        }
+
+        console.log('📊 Branch', conn.id, '- Querying for today\'s orders using raw SQL with CURDATE()');
+
+        // Build SQL filters and parameters
+        const companyFilter = companyId ? 'AND companyId = ?' : '';
+        const params = companyId ? [companyId] : [];
+
+        const todayResults = await sequelize.query<TodayStatsResult>(`
+          SELECT
+            COUNT(*) as todayorder,
+            SUM(total) as todayamount
+          FROM order_master
+          WHERE DATE(createdAt) = CURDATE()
+            AND orderStatus != 'cancelled'
+            ${companyFilter}
+        `, {
+          replacements: params,
+          type: QueryTypes.SELECT,
+        });
+        const today = todayResults[0];
+
+        console.log('📈 Branch', conn.id, '- Today stats:', today);
+
+        // Get last 7 days data using raw SQL
+        const last7days = await sequelize.query<Last7DaysResult>(`
+          SELECT
+            DATE(createdAt) as label,
+            SUM(total) as value
+          FROM order_master
+          WHERE createdAt >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+            AND orderStatus != 'cancelled'
+            ${companyFilter}
+          GROUP BY DATE(createdAt)
+          ORDER BY DATE(createdAt) ASC
+        `, {
+          replacements: params,
+          type: QueryTypes.SELECT,
+        });
+
+        // Get top branch using raw SQL
+        const topBranchResults = await sequelize.query<TopBranchResult>(`
+          SELECT
+            om.companyId,
+            SUM(om.total) as totalSales,
+            COUNT(om.id) as totalOrders,
+            cm.id as cm_id,
+            cm.bname as cm_bname
+          FROM order_master om
+          LEFT JOIN company_master cm ON om.companyId = cm.id
+          WHERE DATE(om.createdAt) = CURDATE()
+            AND om.orderStatus != 'cancelled'
+            ${companyFilter}
+          GROUP BY om.companyId, cm.id
+          ORDER BY SUM(om.total) DESC
+          LIMIT 1
+        `, {
+          replacements: params,
+          type: QueryTypes.SELECT,
+        });
+
+        // Format to match expected structure
+        const topBranch = topBranchResults[0] ? {
+          companyId: topBranchResults[0].companyId,
+          totalSales: topBranchResults[0].totalSales,
+          totalOrders: topBranchResults[0].totalOrders,
+          CompanyMaster: {
+            id: topBranchResults[0].cm_id,
+            bname: topBranchResults[0].cm_bname,
+          }
+        } : null;
+
+        // Get top product using raw SQL
+        const companyFilterForItems = companyId ? 'AND oi.companyId = ?' : '';
+        const topProductResults = await sequelize.query<TopProductResult>(`
+          SELECT
+            oi.productId,
+            SUM(oi.sp_price * oi.quantity) as totalAmount,
+            SUM(oi.quantity) as totalSold,
+            pm.idescription as pm_idescription,
+            pm.sp_price as pm_sp_price
+          FROM order_items oi
+          LEFT JOIN product_master pm ON oi.productId = pm.id
+          WHERE DATE(oi.createdAt) = CURDATE()
+            AND oi.orderStatus != 'cancelled'
+            ${companyFilterForItems}
+          GROUP BY oi.productId
+          ORDER BY SUM(oi.quantity) DESC
+          LIMIT 1
+        `, {
+          replacements: params,
+          type: QueryTypes.SELECT,
+        });
+
+        // Format to match expected structure
+        const topProduct = topProductResults[0] ? {
+          productId: topProductResults[0].productId,
+          totalAmount: topProductResults[0].totalAmount,
+          totalSold: topProductResults[0].totalSold,
+          ProductMaster: {
+            idescription: topProductResults[0].pm_idescription,
+            sp_price: topProductResults[0].pm_sp_price,
+          }
+        } : null;
+
+        return {
+          branchId: conn.id,
+          branchName: conn.name,
+          today,
+          last7days,
+          topBranch,
+          topProduct,
+        };
+      });
+
+      // Filter out null results (skipped branches)
+      const validResults = branchResults.filter((r) => r !== null);
+      console.log('🔍 validResults.length:', validResults.length);
+      console.log('🔍 branchResults:', JSON.stringify(branchResults.map(r => r ? { branchId: r.branchId, today: r.today } : null), null, 2));
+
+      // Aggregate data from all branches
+      const totalTodayAmount = validResults.reduce((sum, r) => sum + (Number(r.today?.todayamount) || 0), 0);
+      const totalTodayOrder = validResults.reduce((sum, r) => sum + (Number(r.today?.todayorder) || 0), 0);
+      console.log('🔍 Aggregated totals - Orders:', totalTodayOrder, 'Amount:', totalTodayAmount);
+
+      // Merge chart data from all branches
+      const chartDataMap = new Map<string, number>();
+      validResults.forEach((result) => {
+        result.last7days.forEach((item) => {
+          const label = moment(item.label).format('D');
+          const currentValue = chartDataMap.get(label) || 0;
+          chartDataMap.set(label, currentValue + (Number(item.value) || 0));
+        });
+      });
+
+      const formattedData = Array.from(chartDataMap.entries())
+        .map(([label, value]) => ({ label, value }))
+        .sort((a, b) => Number(a.label) - Number(b.label));
+
+      // Find overall top branch across all databases
+      const allBranches = validResults.filter((r) => r.topBranch).map((r) => r.topBranch!);
+      const topBranch = allBranches.reduce((max, branch) => {
+        if (!max) return branch;
+        if (Number(branch.totalSales) > Number(max.totalSales)) {
+          return branch;
+        }
+        return max;
+      }, null as typeof allBranches[0] | null);
+
+      // Find overall top product across all databases
+      const allProducts = validResults.filter((r) => r.topProduct).map((r) => r.topProduct!);
+      const topProduct = allProducts.reduce((max, product) => {
+        if (!max) return product;
+        if (Number(product.totalSold) > Number(max.totalSold)) {
+          return product;
+        }
+        return max;
+      }, null as typeof allProducts[0] | null);
+
+      const obj = {
+        today_amount: totalTodayAmount,
+        today_order: totalTodayOrder,
+        chart: formattedData,
+        today_branch: topBranch,
+        today_product: topProduct,
+      };
+
+      return new CommonResponseDto(obj, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('err ==>', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+
+  // REPORTS V2 - Monthly report from all 7 branches
+  async Reports1(pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        // If branchId filter is specified, skip other branches
+        if (pageOpt?.branchId && conn.id !== pageOpt.branchId) {
+          return null;
+        }
+
+        const DateCondition: any = {
+          orderStatus: { [Op.ne]: 'cancelled' },
+        };
+
+        // Filter by companyId if provided
+        if (companyId) {
+          DateCondition.companyId = companyId;
+        }
+
+        if (pageOpt?.from_date && pageOpt?.to_date) {
+          const startDate = await this.formatDate(pageOpt.from_date);
+          const endDate = await this.formatDate(pageOpt.to_date);
+          DateCondition.createdAt = { [Op.between]: [startDate, endDate] };
+        }
+
+        const monthlyReport = await OrderMaster.findAll({
+          attributes: [
+            [fn('DATE_FORMAT', col('createdAt'), '%Y-%m'), 'month'],
+            [fn('SUM', col('total')), 'totalSales'],
+            [fn('COUNT', col('id')), 'totalOrders'],
+          ],
+          where: DateCondition,
+          group: [fn('DATE_FORMAT', col('createdAt'), '%Y-%m')],
+          order: [[fn('DATE_FORMAT', col('createdAt'), '%Y-%m'), 'DESC']],
+          raw: true,
+        });
+
+        return monthlyReport;
+      });
+
+      // Filter out null results and flatten
+      const validResults = branchResults.filter((r) => r !== null).flat();
+
+      // Aggregate by month
+      const monthlyMap = new Map();
+      validResults.forEach((item: any) => {
+        const month = item.month;
+        const current = monthlyMap.get(month) || { month, totalSales: 0, totalOrders: 0 };
+        current.totalSales += Number(item.totalSales) || 0;
+        current.totalOrders += Number(item.totalOrders) || 0;
+        monthlyMap.set(month, current);
+      });
+
+      const monthlyReport = Array.from(monthlyMap.values()).sort((a, b) => b.month.localeCompare(a.month));
+
+      return new CommonResponseDto(monthlyReport, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('err ==>', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+
+  // BRANCH PICKER V2 - Get all branches from all databases
+  async BranchePicker1(pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        const whereCondition: any = {};
+
+        // Filter by companyId if provided
+        if (companyId) {
+          whereCondition.id = companyId;
+        }
+
+        const branches = await CompanyMaster.findAll({
+          where: whereCondition,
+          attributes: ['id', 'bname'],
+        });
+        return branches;
+      });
+
+      // Flatten and deduplicate by id
+      const allBranches = branchResults.flat();
+      const uniqueBranches = Array.from(
+        new Map(allBranches.map((b: any) => [b.id, b])).values()
+      );
+
+      return new CommonResponseDto(uniqueBranches, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('err ==>', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+
+  // BRANCHES V2 - Get all branches with stats from all databases
+  async Branches1(pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        const DateCondition: any = {
+          orderStatus: { [Op.ne]: 'cancelled' },
+        };
+
+        // Filter by companyId if provided
+        if (companyId) {
+          DateCondition.companyId = companyId;
+        }
+
+        const searchQuery: any = {};
+
+        if (pageOpt?.from_date && pageOpt?.to_date) {
+          const startDate = await this.formatDate(pageOpt.from_date);
+          const endDate = await this.formatDate(pageOpt.to_date);
+          DateCondition.createdAt = { [Op.between]: [startDate, endDate] };
+        }
+
+        if (pageOpt?.query) {
+          searchQuery.bname = { [Op.like]: `%${pageOpt.query}%` };
+        }
+
+        if (pageOpt?.branchId) {
+          DateCondition.companyId = pageOpt.branchId;
+        }
+
+        const branches = await OrderMaster.findAll({
+          attributes: [
+            'companyId',
+            [fn('COUNT', col('OrderMaster.id')), 'totalOrders'],
+            [fn('SUM', col('OrderMaster.total')), 'totalSales'],
+          ],
+          include: [
+            {
+              model: CompanyMaster,
+              attributes: ['id', 'bname', 'fulladdress', 'state'],
+              where: searchQuery,
+            },
+          ],
+          where: DateCondition,
+          group: ['OrderMaster.companyId', 'CompanyMaster.id'],
+          order: [[fn('SUM', col('OrderMaster.total')), 'DESC']],
+          raw: true,
+          nest: true,
+        });
+
+        return branches;
+      });
+
+      // Flatten all results
+      const allBranches = branchResults.flat();
+
+      // Aggregate by companyId
+      const branchMap = new Map();
+      allBranches.forEach((branch: any) => {
+        const id = branch.CompanyMaster?.id || branch.companyId;
+        const current = branchMap.get(id) || {
+          companyId: id,
+          totalOrders: 0,
+          totalSales: 0,
+          CompanyMaster: branch.CompanyMaster,
+        };
+        current.totalOrders += Number(branch.totalOrders) || 0;
+        current.totalSales += Number(branch.totalSales) || 0;
+        branchMap.set(id, current);
+      });
+
+      const branches = Array.from(branchMap.values()).sort(
+        (a, b) => Number(b.totalSales) - Number(a.totalSales)
+      );
+
+      return new CommonResponseDto(branches, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('err ==>', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+
+  // BRANCH DETAILS V2 - Get specific branch details from all databases
+  async Branch_details1(id: number, pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      // Default to last 30 days if no dates provided
+      const defaultStartDate = moment().subtract(30, 'days').startOf('day').toDate();
+      const defaultEndDate = moment().endOf('day').toDate();
+
+      const startDate = await this.formatDate(pageOpt?.from_date || defaultStartDate);
+      const endDate = await this.formatDate(pageOpt?.to_date || defaultEndDate);
+
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        const { sequelize } = conn;
+
+        interface DailyDataResult {
+          companyId: number;
+          orderDate: string;
+          totalOrders: number;
+          totalSales: number;
+        }
+
+        interface TotalsResult {
+          companyId: number;
+          totalOrders: number;
+          totalSales: number;
+        }
+
+        interface BranchResult {
+          id: number;
+          bname: string;
+          [key: string]: any;
+        }
+
+        // Query daily data
+        const data = await sequelize.query<DailyDataResult>(`
+          SELECT
+            companyId,
+            DATE(createdAt) as orderDate,
+            COUNT(id) as totalOrders,
+            SUM(total) as totalSales
+          FROM order_master
+          WHERE companyId = ?
+            AND orderStatus != 'cancelled'
+            AND createdAt BETWEEN ? AND ?
+          GROUP BY DATE(createdAt)
+          ORDER BY DATE(createdAt) DESC
+        `, {
+          replacements: [id, startDate, endDate],
+          type: QueryTypes.SELECT,
+        });
+
+        // Query totals
+        const totals = await sequelize.query<TotalsResult>(`
+          SELECT
+            companyId,
+            COUNT(id) as totalOrders,
+            SUM(total) as totalSales
+          FROM order_master
+          WHERE companyId = ?
+            AND orderStatus != 'cancelled'
+            AND createdAt BETWEEN ? AND ?
+          GROUP BY companyId
+          ORDER BY SUM(total) DESC
+        `, {
+          replacements: [id, startDate, endDate],
+          type: QueryTypes.SELECT,
+        });
+
+        // Query branch details
+        const branches = await sequelize.query<BranchResult>(`
+          SELECT * FROM company_master WHERE id = ?
+        `, {
+          replacements: [id],
+          type: QueryTypes.SELECT,
+        });
+
+        const branch = branches.length > 0 ? branches[0] : null;
+
+        return { data, totals, branch };
+      });
+
+      // Aggregate data from all branches
+      const allData = branchResults.flatMap((r) => r.data);
+      const allTotals = branchResults.flatMap((r) => r.totals);
+      const branch = branchResults.find((r) => r.branch)?.branch;
+
+      // Merge data by date
+      const dataMap = new Map();
+      allData.forEach((item: any) => {
+        const date = item.orderDate;
+        const current = dataMap.get(date) || { companyId: id, orderDate: date, totalOrders: 0, totalSales: 0 };
+        current.totalOrders += Number(item.totalOrders) || 0;
+        current.totalSales += Number(item.totalSales) || 0;
+        dataMap.set(date, current);
+      });
+
+      const data = Array.from(dataMap.values()).sort((a, b) => b.orderDate.localeCompare(a.orderDate));
+
+      // Aggregate totals
+      const totalOrders = allTotals.reduce((sum, t: any) => sum + (Number(t.totalOrders) || 0), 0);
+      const totalSales = allTotals.reduce((sum, t: any) => sum + (Number(t.totalSales) || 0), 0);
+
+      const obj = {
+        totals: [{ companyId: id, totalOrders, totalSales }],
+        branch,
+        data,
+      };
+
+      return new CommonResponseDto(obj, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('err ==>', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+
+  // PRODUCTS V2 - Get all products from all databases
+  async Products1(pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      console.log('🔍 Products1 called with:', { pageOpt, companyId });
+
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        const { sequelize } = conn;
+
+        // Build SQL filters and parameters
+        const filters: string[] = ["oi.orderStatus != 'cancelled'"];
+        const params: any[] = [];
+
+        // Default to Branch 158 (Nalakath Fruits Perinthalmanna) if no branchId or companyId provided
+        const targetBranchId = companyId || pageOpt?.branchId || 158;
+        filters.push('om.companyId = ?');
+        params.push(targetBranchId);
+
+        // Default to today's date if no dates provided
+        const today = moment().startOf('day').toDate();
+        const todayEnd = moment().endOf('day').toDate();
+        const startDate = await this.formatDate(pageOpt?.from_date || today);
+        const endDate = await this.formatDate(pageOpt?.to_date || todayEnd);
+        filters.push('om.createdAt BETWEEN ? AND ?');
+        params.push(startDate, endDate);
+
+        // Search filter
+        let searchFilter = '';
+        if (pageOpt?.query) {
+          searchFilter = 'AND pm.idescription LIKE ?';
+          params.push(`%${pageOpt.query}%`);
+        }
+
+        const whereClause = filters.join(' AND ');
+
+        console.log('📊 Branch', conn.id, '- Querying products with SQL');
+
+        interface ProductResult {
+          productId: number;
+          idescription: string;
+          sp_price: number;
+          totalAmount: number;
+          totalSold: number;
+          branchId: number;
+        }
+
+        const products = await sequelize.query<ProductResult>(`
+          SELECT
+            oi.productId,
+            CASE
+              WHEN pc.is_show_in_report = 1
+              THEN CONCAT(pm.idescription, ' - ', pc.alias_name)
+              ELSE pm.idescription
+            END as idescription,
+            pm.sp_price,
+            SUM(oi.sp_price * oi.quantity) as totalAmount,
+            SUM(oi.quantity) as totalSold,
+            ? as branchId
+          FROM order_items oi
+          INNER JOIN order_master om ON oi.orderId = om.id
+          INNER JOIN product_master pm ON oi.productId = pm.id
+          LEFT JOIN product_category pc ON pm.product_category = pc.id
+          WHERE ${whereClause} ${searchFilter}
+          GROUP BY oi.productId, pm.idescription, pm.sp_price, pc.is_show_in_report, pc.alias_name
+          ORDER BY SUM(oi.quantity) DESC
+        `, {
+          replacements: [conn.id, ...params],
+          type: QueryTypes.SELECT,
+        });
+
+        console.log('📈 Branch', conn.id, '- Found', products.length, 'products');
+
+        return products;
+      });
+
+      // Flatten all products
+      const allProducts = branchResults.flat();
+
+      console.log('✅ Total products found:', allProducts.length);
+
+      return new CommonResponseDto(allProducts, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('❌ Products1 error:', err);
+      console.error('Full error details:', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+
+  // PRODUCT DETAILS V2 - Get specific product details from all databases
+  async Product_details1(id: number, pageOpt: ReportQueryDto, companyId?: number): Promise<CommonResponseDto> {
+    try {
+      // Default to last 30 days if no dates provided
+      const defaultStartDate = moment().subtract(30, 'days').startOf('day').toDate();
+      const defaultEndDate = moment().endOf('day').toDate();
+
+      const startDate = await this.formatDate(pageOpt?.from_date || defaultStartDate);
+      const endDate = await this.formatDate(pageOpt?.to_date || defaultEndDate);
+
+      const branchResults = await this.queryAllBranches(async (conn) => {
+        const { sequelize } = conn;
+
+        interface DailyProductResult {
+          productId: number;
+          totalAmount: number;
+          prodDate: string;
+          totalOrders: number;
+          totalQuantity: number;
+        }
+
+        interface TotalQuantityResult {
+          productId: number;
+          totalSold: number;
+        }
+
+        interface ProductResult {
+          id: number;
+          idescription: string;
+          [key: string]: any;
+        }
+
+        // Build WHERE conditions
+        const conditions = ['oi.productId = ?', "oi.orderStatus != 'cancelled'", 'oi.createdAt BETWEEN ? AND ?'];
+        const params = [id, startDate, endDate];
+
+        // Add companyId filter if provided
+        if (companyId) {
+          conditions.push('oi.companyId = ?');
+          params.push(companyId);
+        }
+
+        const whereClause = conditions.join(' AND ');
+
+        // Query daily data
+        const data = await sequelize.query<DailyProductResult>(`
+          SELECT
+            oi.productId,
+            SUM(oi.sp_price * oi.quantity) as totalAmount,
+            DATE(oi.createdAt) as prodDate,
+            COUNT(oi.id) as totalOrders,
+            SUM(oi.quantity) as totalQuantity
+          FROM order_items oi
+          WHERE ${whereClause}
+          GROUP BY DATE(oi.createdAt)
+          ORDER BY DATE(oi.createdAt) DESC
+        `, {
+          replacements: params,
+          type: QueryTypes.SELECT,
+        });
+
+        // Query total quantity
+        const totalQuantity = await sequelize.query<TotalQuantityResult>(`
+          SELECT
+            oi.productId,
+            SUM(oi.quantity) as totalSold
+          FROM order_items oi
+          WHERE ${whereClause}
+          GROUP BY oi.productId
+          ORDER BY SUM(oi.quantity) DESC
+        `, {
+          replacements: params,
+          type: QueryTypes.SELECT,
+        });
+
+        // Query product details
+        const products = await sequelize.query<ProductResult>(`
+          SELECT * FROM product_master WHERE id = ?
+        `, {
+          replacements: [id],
+          type: QueryTypes.SELECT,
+        });
+
+        const product = products.length > 0 ? products[0] : null;
+
+        return { data, totalQuantity, product };
+      });
+
+      // Aggregate data
+      const allData = branchResults.flatMap((r) => r.data);
+      const allTotalQuantity = branchResults.flatMap((r) => r.totalQuantity);
+      const product = branchResults.find((r) => r.product)?.product;
+
+      // Merge data by date
+      const dataMap = new Map();
+      allData.forEach((item: any) => {
+        const date = item.prodDate;
+        const current = dataMap.get(date) || {
+          productId: id,
+          prodDate: date,
+          totalAmount: 0,
+          totalOrders: 0,
+          totalQuantity: 0,
+        };
+        current.totalAmount += Number(item.totalAmount) || 0;
+        current.totalOrders += Number(item.totalOrders) || 0;
+        current.totalQuantity += Number(item.totalQuantity) || 0;
+        dataMap.set(date, current);
+      });
+
+      const data = Array.from(dataMap.values()).sort((a, b) => b.prodDate.localeCompare(a.prodDate));
+
+      // Aggregate total quantity
+      const totalSold = allTotalQuantity.reduce((sum, t: any) => sum + (Number(t.totalSold) || 0), 0);
+
+      const obj = {
+        totalQuantity: [{ productId: id, totalSold }],
+        product,
+        data,
+      };
+
+      return new CommonResponseDto(obj, true, 'Data fetch successfully');
+    } catch (err) {
+      console.log('err ==>', err);
+      return new CommonResponseDto({}, false, 'No Data Found');
+    }
+  }
+}

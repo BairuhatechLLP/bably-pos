@@ -1,0 +1,535 @@
+{
+	"info": {
+		"_postman_id": "nalakath-report-api-v2",
+		"name": "Nalakath Report API v2",
+		"description": "Complete API collection for Nalakath Report Manager Server\n\nBase URL: http://localhost:8063\n\nAll endpoints are production-ready and tested.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Login - Email & Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"ras@nalakath.com\",\n  \"password\": \"your-password-here\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8063/auth/staff/email-login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"auth",
+								"staff",
+								"email-login"
+							]
+						},
+						"description": "Login with email and password to get JWT access token.\n\nAllowed email: ras@nalakath.com (Branch 1, companyId: 158)"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for login and token generation"
+		},
+		{
+			"name": "Dashboard & Reports",
+			"item": [
+				{
+					"name": "Home - Today's Dashboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/home",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"home"
+							]
+						},
+						"description": "Get today's sales summary from all branches including:\n- Today's total orders and sales\n- Last 7 days chart data\n- Top branches\n- Top products\n\nResponse time: ~3.8s\nData aggregated from 5 databases"
+					},
+					"response": []
+				},
+				{
+					"name": "Reports - Available Report Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/reports",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"reports"
+							]
+						},
+						"description": "Get list of all available report types.\n\nResponse time: ~1.8s\nReturns 10 report types"
+					},
+					"response": []
+				}
+			],
+			"description": "Dashboard and report listing endpoints"
+		},
+		{
+			"name": "Branch Reports",
+			"item": [
+				{
+					"name": "Branch Picker - All Branches",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/branch_picker",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"branch_picker"
+							]
+						},
+						"description": "Get list of all branches for dropdown/picker selection.\n\nResponse time: ~0.7s\nReturns 36 branches"
+					},
+					"response": []
+				},
+				{
+					"name": "Branch - Sales Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/branch",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"branch"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01",
+									"description": "Start date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31",
+									"description": "End date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "branchId",
+									"value": "1",
+									"description": "Filter by specific branch",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get sales data grouped by branch.\n\nOptional query parameters:\n- from_date: Start date (YYYY-MM-DD)\n- to_date: End date (YYYY-MM-DD)\n- branchId: Filter by specific branch\n\nResponse time: ~3.0s\nReturns 9 branches with sales data"
+					},
+					"response": []
+				},
+				{
+					"name": "Branch - With Date Filter",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/branch?from_date=2024-10-01&to_date=2024-10-31",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"branch"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01",
+									"description": "Start date"
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31",
+									"description": "End date"
+								}
+							]
+						},
+						"description": "Get branch sales for a specific date range"
+					},
+					"response": []
+				},
+				{
+					"name": "Branch Details - ID 1 (Last 30 Days)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/branch_details/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"branch_details",
+								"1"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01",
+									"description": "Start date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31",
+									"description": "End date (YYYY-MM-DD)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get daily sales details for branch ID 1.\n\nDefault: Last 30 days\nOptional query parameters:\n- from_date: Start date\n- to_date: End date\n\nResponse time: ~1.5s\nReturns daily sales data with totals"
+					},
+					"response": []
+				},
+				{
+					"name": "Branch Details - ID 2",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/branch_details/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"branch_details",
+								"2"
+							]
+						},
+						"description": "Get daily sales details for branch ID 2"
+					},
+					"response": []
+				},
+				{
+					"name": "Branch Details - ID 158",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/branch_details/158",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+								"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"branch_details",
+								"158"
+							]
+						},
+						"description": "Get daily sales details for branch ID 158"
+					},
+					"response": []
+				}
+			],
+			"description": "Branch-related endpoints for sales and details"
+		},
+		{
+			"name": "Product Reports",
+			"item": [
+				{
+					"name": "Products - All (WARNING: 60-70s)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"products"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01",
+									"description": "Start date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31",
+									"description": "End date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "branchId",
+									"value": "1",
+									"description": "Filter by branch",
+									"disabled": true
+								},
+								{
+									"key": "query",
+									"value": "milk",
+									"description": "Search by product name",
+									"disabled": true
+								}
+							]
+						},
+						"description": "⚠️ WARNING: This endpoint returns 11,434 products and takes 60-70 seconds!\n\nOptional query parameters:\n- from_date: Start date\n- to_date: End date\n- branchId: Filter by branch\n- query: Search by product name\n\nRecommendation: Use search query to filter results"
+					},
+					"response": []
+				},
+				{
+					"name": "Products - Search 'Milk'",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/products?query=milk",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"products"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "milk",
+									"description": "Search for products containing 'milk'"
+								}
+							]
+						},
+						"description": "Search for products containing 'milk' in the name.\n\nMuch faster than getting all products!"
+					},
+					"response": []
+				},
+				{
+					"name": "Products - By Branch",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/products?branchId=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"products"
+							],
+							"query": [
+								{
+									"key": "branchId",
+									"value": "1",
+									"description": "Filter by branch ID 1"
+								}
+							]
+						},
+						"description": "Get products from a specific branch only"
+					},
+					"response": []
+				},
+				{
+					"name": "Products - Date Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/products?from_date=2024-10-01&to_date=2024-10-31",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"products"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01"
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31"
+								}
+							]
+						},
+						"description": "Get products sold within a specific date range"
+					},
+					"response": []
+				},
+				{
+					"name": "Product Details - ID 610 (Avil Milk)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/product_details/610",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"product_details",
+								"610"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01",
+									"description": "Start date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31",
+									"description": "End date (YYYY-MM-DD)",
+									"disabled": true
+								},
+								{
+									"key": "companyId",
+									"value": "1",
+									"description": "Filter by branch/company",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Get daily sales details for product ID 610 (Avil Milk Sp).\n\nDefault: Last 30 days\nOptional query parameters:\n- from_date: Start date\n- to_date: End date\n- companyId: Filter by branch\n\nResponse time: ~3.6s\nTotal sold: 11,302 units"
+					},
+					"response": []
+				},
+				{
+					"name": "Product Details - ID 2",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/product_details/2",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"product_details",
+								"2"
+							]
+						},
+						"description": "Get daily sales details for product ID 2"
+					},
+					"response": []
+				},
+				{
+					"name": "Product Details - With Date Range",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8063/report_app/v2/product_details/610?from_date=2024-10-01&to_date=2024-10-31",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8063",
+							"path": [
+								"report_app",
+								"v2",
+								"product_details",
+								"610"
+							],
+							"query": [
+								{
+									"key": "from_date",
+									"value": "2024-10-01"
+								},
+								{
+									"key": "to_date",
+									"value": "2024-10-31"
+								}
+							]
+						},
+						"description": "Get product details for a specific date range"
+					},
+					"response": []
+				}
+			],
+			"description": "Product-related endpoints for sales and details"
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8063",
+			"type": "string"
+		}
+	]
+}
